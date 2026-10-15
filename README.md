@@ -1,3 +1,5 @@
+Live site: https://alicelokc.github.io/s2science/
+
 # Mochi Science Pals — S2 (Unit 8 electricity demo)
 
 This folder is a **fork** of the S1 Mochi Science Pals game shell, retargeted for **Hong Kong Junior Science S2 — Unit 8: Making use of electricity / 電的使用** (sub-topics 8.1–8.7).
@@ -28,7 +30,14 @@ python3 -m http.server 8765
 - Legendary unit pets / co-op materials tied to old units 1–6 mostly stay locked; Unit 8 has a `Copper Wire` material slot
 - Some Nobel story text still mentions S1 separation methods in historical flavour text
 
+## Login modes
+- **`GOOGLE_CLIENT_ID` only** (in `window.S1_CONFIG`): any Google account can sign in; progress is per-email on this device (no class list / cloud sync).
+- **Client ID + `API_URL`**: full class-server mode (see `server/SETUP.md`).
+- **Both empty**: preview / play without Google (current live deploy until Alice pastes a new Client ID).
+
 ## Next steps (for Alice)
+- Create a **Web** OAuth Client ID in [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials)
+- Authorised JavaScript origin: `https://alicelokc.github.io` (no trailing slash)
+- Paste the Client ID into `window.S1_CONFIG.GOOGLE_CLIENT_ID` in `index.html` (leave `API_URL` empty for open on-device login)
 - Playtest Study → 8.1–8.7 notes, terms, quizzes
-- Optionally prune or rewrite Nobel / town / co-op for electricity only
-- Publish to GitHub Pages when ready (do not commit secrets)
+- Optionally add Apps Script later for class cloud sync (`API_URL`)
