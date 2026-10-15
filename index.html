@@ -8528,14 +8528,16 @@ function openStudy(id){var s=secById(id);if(!s)return;S.lastUnit=s.chap.id;var n
 /* QUIZ */
 var Q=null;
 var QN=15;
-function pickQs(sec){var n=sec.qs.length,seen=S.seen[sec.id]||[],skip=seen.slice(-Math.max(0,Math.min(30,n-QN)));
+function pickQs(sec){if(!sec||!sec.qs||!sec.qs.length)return [];
+ var n=sec.qs.length,seen=S.seen[sec.id]||[],k=Math.max(0,Math.min(30,n-QN)),skip=k?seen.slice(-k):[];
  var pool=[];for(var i=0;i<n;i++)if(skip.indexOf(i)<0)pool.push(i);
+ if(!pool.length&&n){for(var j=0;j<n;j++)pool.push(j);}
  pool=shuffle(pool).sort(function(a,b){return (S.q[sec.id+'#'+a]===1?1:0)-(S.q[sec.id+'#'+b]===1?1:0);});
- var chosen=shuffle(pool.slice(0,QN));
+ var chosen=shuffle(pool.slice(0,Math.min(QN,n)));
  S.seen[sec.id]=seen.concat(chosen).slice(-30);return chosen.map(function(i){return sec.id+'#'+i;});}
-function startQuiz(id,mode,list){var ids;if(id&&secById(id))S.lastUnit=secById(id).chap.id;
- if(mode==='quiz')ids=pickQs(secById(id));else ids=list;
- if(!ids.length)return;
+function startQuiz(id,mode,list){var ids;var sec=id?secById(id):null;
+ if(mode==='quiz'){if(!sec){toast(L('That topic is not in this S2 unit yet.','這個課題尚未加入本中二單元。'));return;}S.lastUnit=sec.chap.id;ids=pickQs(sec);}else ids=list||[];
+ if(!ids||!ids.length){if(mode==='quiz')toast(L('No questions ready for this topic yet.','這個小節暫時未有題目。'));return;}
  Q={mode:mode,sec:id,ids:ids,i:0,res:[],shown:0,answered:false,fast:0,t0:Date.now(),fr:mode==='quiz'?secFresh(id):null,newOk:0,repOk:0,rush:0,rushed:{}};showQ();}
 function quizRec(status,stars){if(!Q)return;var done=Q.ids.slice(0,Q.res.length);var sec=Q.mode==='quiz'?secById(Q.sec):null;
  logRec({mode:Q.mode,unit:sec?String(sec.chap.id):'',sec:sec?Q.sec:'',ans:Q.res.length,cor:Q.res.filter(Boolean).length,stars:stars||0,secs:Math.round((Date.now()-Q.t0)/1000),status:status,start:new Date(Q.t0).toISOString(),ids:done.join(' '),wrong:done.filter(function(id,i){return !Q.res[i];}).join(' ')});}
@@ -9295,12 +9297,12 @@ var DT=[
  ['perfect','💯','Perfect day','完美一天','Get full marks in any quiz today. You\'ve got this!','今日在任何測驗取得滿分，你做得到！',function(w){return threeStars()>=3?3:0;},{k:'perfect'}],
  ['marathon','🏃','Brain marathon','腦力馬拉松','Answer 25 questions correctly today (quizzes or 錯題本).','今日答對 25 題（測驗或錯題本都算）。',function(w){return 3;},{k:'correct',n:25}],
  ['sprint','⚡','Quick sprint','快速衝刺','Answer 12 questions correctly – even a short session counts!','答對 12 題——短時間溫習也算！',function(w){return 2;},{k:'correct',n:12}],
- ['lab','🧪','Lab safety check','實驗室安全檢查','The lab inspector is coming! Get ★★ in 1.3 Safety in the laboratory.','實驗室督察要來了！在 1.3 實驗室安全取得 ★★。',function(w){return secStars('1.3')<2?4:0;},{k:'quiz',sec:'1.3',st:2}],
- ['water','💧','Water rescue','拯救食水','The water treatment works needs help! Quiz a Unit 2 sub-topic you find hard.','濾水廠需要幫手！在第 2 單元選一個你覺得難的小節做測驗。',function(w){return unitRatio(CHAPTERS[1])<0.8?3:0;},{k:'unit',unit:2,n:1}],
- ['zoo','🦋','Nature patrol','自然巡邏隊','Rangers need help identifying animals: quiz a Unit 3 sub-topic.','巡邏隊需要幫忙辨認動物：在第 3 單元做一次測驗。',function(w){return unitRatio(CHAPTERS[2])<0.8?3:0;},{k:'unit',unit:3,n:1}],
- ['cell','🔬','Microscope mission','顯微鏡任務','Zoom in! Read the notes of a Unit 4 sub-topic you have not studied well.','放大觀察！閱讀一個你未溫熟的第 4 單元小節筆記。',function(w){return unitRatio(CHAPTERS[3])<0.8?3:0;},{k:'unitnotes',unit:4}],
- ['power','🔌','Power cut!','停電了！','The lights went out! Restore power by quizzing a Unit 5 Energy sub-topic.','停電了！在第 5 單元能量做一次測驗恢復電力。',function(w){return unitRatio(CHAPTERS[4])<0.8?3:0;},{k:'unit',unit:5,n:1}],
- ['particle','⚛️','Particle party','粒子派對','The particles are throwing a party – join them with a Unit 6 quiz.','粒子正在開派對——做一次第 6 單元測驗加入它們。',function(w){return unitRatio(CHAPTERS[5])<0.8?3:0;},{k:'unit',unit:6,n:1}],
+ ['lab','🧪','Circuit check','電路檢查','The lab inspector is coming! Get ★★ in 8.1 Simple circuits.','實驗室督察要來了！在 8.1 簡單電路取得 ★★。',function(w){return secStars('8.1')<2?4:0;},{k:'quiz',sec:'8.1',st:2}],
+ ['current','💧','Current rescue','電流救援','The ammeters need help! Get ★★ in 8.2 Current.','電流計需要幫手！在 8.2 電流取得 ★★。',function(w){return secStars('8.2')<2?3:0;},{k:'quiz',sec:'8.2',st:2}],
+ ['volt','⚡','Voltage patrol','電壓巡邏','Rangers need a voltage reading: quiz 8.3 Voltage.','巡邏隊需要量度電壓：做一次 8.3 電壓測驗。',function(w){return secStars('8.3')<2?3:0;},{k:'quiz',sec:'8.3',st:2}],
+ ['ohm','🔬','Resistance mission','電阻任務','Zoom in on resistance! Read the 8.4 notes.','放大觀察電阻！閱讀 8.4 筆記。',function(w){return secStars('8.4')<3?3:0;},{k:'notes',sec:'8.4'}],
+ ['power','🔌','Power cut!','停電了！','The lights went out! Restore power with a quiz on 8.6 Household electricity.','停電了！做一次 8.6 家居用電測驗恢復電力。',function(w){return secStars('8.6')<2?3:0;},{k:'quiz',sec:'8.6',st:2}],
+ ['particle','⚛️','Efficiency party','效率派對','Join the efficiency party – quiz 8.7 Power and efficiency.','加入效率派對——做一次 8.7 功率與效率測驗。',function(w){return secStars('8.7')<2?3:0;},{k:'quiz',sec:'8.7',st:2}],
  ['teacher','👩‍🏫','Be the teacher','當小老師','Read the {sec} notes and explain one point out loud to someone at home.','閱讀 {sec} 筆記，然後向家人講解其中一點。',function(w){return 2;},{k:'notes',sec:'ws'}],
  ['comeback','🌱','Comeback kid','捲土重來','{sec} was your hardest. Take the quiz again and beat your old score – mistakes are how brains grow.','{sec} 是你最難的小節。再做一次測驗，打破舊紀錄——錯誤令腦袋成長。',function(w){return secPlays(w.ws.id)&&secStars(w.ws.id)<=1?6:0;},{k:'quiz',sec:'ws',st:1}],
  ['double','🎯','Double trouble','雙重挑戰','Clear 2 mistakes AND read one set of notes. Two small steps!','清除 2 條錯題，再閱讀一次筆記。兩小步！',function(w){return w.mist>=2?3:0;},{k:'clearnotes',n:2}],
@@ -9313,7 +9315,9 @@ function dtPick(){var w=weakInfo(),cand=[],tot=0;DT.forEach(function(d){var wt=d
  var g=d[7],task={id:d[0],d:today(),base:{cleared:S.cleared,dict:S.dict.n||0,say:S.say.rounds||0,match:S.matchWins||0,perfect:S.perfect||0,tc:S.tc||0,studies:S.studies},done:false};
  if(g.sec)task.sec=typeof g.sec==='string'&&w[g.sec]?w[g.sec].id:g.sec;
  if(g.unit)task.unit=typeof g.unit==='number'?g.unit:(w[g.unit]||w.wu).id;
- if(g.k==='unitnotes'){var c=CHAPTERS[task.unit-1],pick2=c.sections.filter(function(s){return secStars(s.id)<3;})[0]||c.sections[0];task.sec=pick2.id;task.k2='notes';}
+ if(g.k==='unitnotes'){var c=chapById(task.unit)||CHAPTERS[0];if(!c||!c.sections||!c.sections.length){task.sec=(ALLSECS[0]||{}).id;task.k2='notes';}
+  else{var pick2=c.sections.filter(function(s){return secStars(s.id)<3;})[0]||c.sections[0];task.sec=pick2.id;task.k2='notes';}}
+ if(task.sec&&!secById(task.sec))task.sec=(ALLSECS[0]||{}).id;
  return task;}
 function dtDef(id){return DT.filter(function(d){return d[0]===id;})[0];}
 function dtTask(){if(!S.dtask||S.dtask.d!==today()||!dtDef(S.dtask.id)){S.dtask=dtPick();save();}return S.dtask;}
@@ -9333,14 +9337,15 @@ function dtProgress(t){var g=dtDef(t.id)[7],b=t.base,q=qdayList();
   case 'clearnotes':return [Math.min(S.cleared-b.cleared,2)+(S.studies>b.studies?1:0),3];
   case 'anyboth':return [(S.studies>b.studies?1:0)+(q.length?1:0),2];}
  return [0,1];}
-function dtText(t,s){var sec=t.sec?secById(t.sec):null,u=t.unit?CHAPTERS[t.unit-1]:null;return s.replace('{sec}',secName(sec)).replace('{unit}',unitName(u)).replace('{vunit}',unitName(u));}
+function chapById(id){for(var i=0;i<CHAPTERS.length;i++)if(String(CHAPTERS[i].id)===String(id))return CHAPTERS[i];return null;}
+function dtText(t,s){var sec=t.sec?secById(t.sec):null,u=t.unit!=null?chapById(t.unit):null;return s.replace('{sec}',secName(sec)).replace('{unit}',unitName(u)).replace('{vunit}',unitName(u));}
 function dtCheck(){if(!S||!S.started||!S.dtask||S.dtask.d!==today()||S.dtask.done)return;var p=dtProgress(S.dtask);if(p[0]>=p[1]){S.dtask.done=true;
  var d=dtDef(S.dtask.id),food=pick(['siumai','wonton','salad','blueberry','eggtart']);S.coins+=40;S.food[food]=(S.food[food]||0)+1;var f=foodById(food);
  setTimeout(function(){popup('<div style="font-size:64px">'+d[1]+'</div><h2>🎉 '+L('Mission complete!','任務完成！')+'</h2><p><b>'+esc(L(d[2],d[3]))+'</b></p><p>+40 🪙 · +1 '+foodIcon(f,'inl')+' '+esc(LL(f))+'</p><p class="muted" style="font-size:13px">'+L('You practised the part you usually skip. That is how champions are made! 💪','你練習了平時會避開的部分，冠軍就是這樣煉成的！💪')+'</p>');confetti();},1400);}}
-function dtGo(t){var g=dtDef(t.id)[7];
+function dtGo(t){var g=dtDef(t.id);if(!g){curScreen='study';render();return;}g=g[7];
  if(g.k==='clear'||g.k==='clearnotes'&&Object.keys(S.mistakes).length){curScreen='practice';render();return;}
- if(g.k==='quiz'||g.k==='nq'&&S.studyDay[t.sec]===today()){startQuiz(t.sec,'quiz');return;}
- if(g.k==='notes'||g.k==='unitnotes'||g.k==='nq'){openStudy(t.sec);return;}
+ if(g.k==='quiz'||g.k==='nq'&&S.studyDay[t.sec]===today()){if(!secById(t.sec)){toast(L('That topic is not in this S2 unit yet.','這個課題尚未加入本中二單元。'));curScreen='study';render();return;}startQuiz(t.sec,'quiz');return;}
+ if(g.k==='notes'||g.k==='unitnotes'||g.k==='nq'){if(!secById(t.sec)){toast(L('That topic is not in this S2 unit yet.','這個課題尚未加入本中二單元。'));curScreen='study';render();return;}openStudy(t.sec);return;}
  if(g.k==='dict'){openDictSetup(null);return;}if(g.k==='say'){openSpeakSetup(null);return;}if(g.k==='vocab'){openVocab(t.unit);return;}
  if(g.k==='match'){openMatch();return;}
  curScreen='study';render();window.scrollTo(0,0);}
