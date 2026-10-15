@@ -2895,8 +2895,10 @@ svg.pet.prz{overflow:visible;animation:pzGlow 4s linear infinite}
 <div id="ovroot"></div>
 <div id="poproot"></div>
 <script>
-/* ▼▼ CLASS LOGIN SETTINGS – fill in after following server/SETUP.md (leave empty = guest only) ▼▼ */
-window.S1_CONFIG={GOOGLE_CLIENT_ID:"742019381229-dnk6iv61fguubpcv5b8fe7pru3n63k8t.apps.googleusercontent.com",API_URL:"https://script.google.com/macros/s/AKfycbzbx2MjXKG57_o8Fb5tvvJ58Rf5LaGZiXZynU8MpoJg1Ny-U4A69GwwdXRIKplSCi6Mhg/exec"};
+/* ▼▼ LOGIN SETTINGS – GOOGLE_CLIENT_ID alone = any Google account (progress on this device).
+   Both Client ID + API_URL = class server (cloud sync / leaderboard / teacher). Leave empty = preview only.
+   Create a Web OAuth client for https://alicelokc.github.io — see server/SETUP.md ▼▼ */
+window.S1_CONFIG={GOOGLE_CLIENT_ID:"",API_URL:""};
 /* ▲▲ ------------------------------------------------------------------------------------- ▲▲ */
 </script>
 <script>
@@ -8713,17 +8715,20 @@ function previewCode(v){var o=unpack(v);var pv=$('#prev');if(!pv)return;
  $('#doLoad').onclick=function(){applyCode(o);sfx('fanfare');toast(L('Save loaded! Welcome back ✿','已載入存檔！歡迎回來 ✿'));curScreen='home';closeModal();};}
 
 /* WELCOME */
-function welcomeHTML(){var saved=load(KEY),cloud=cloudOn();
+function welcomeHTML(){var saved=load(KEY),cloud=cloudOn(),gis=gisOn();
+ var loginCard=cloud?'<div class="card login"><b>🎓 '+L('Students & teachers','學生及老師')+'</b><p class="muted" style="margin:4px 0 10px;font-size:14px">'+L('Sign in with your school Google account. Your progress is saved to your class record and works on any device.','用學校 Google 帳戶登入。進度會儲存到班級紀錄，任何裝置都可繼續。')+'</p><div id="gbtn" style="display:flex;justify-content:center;min-height:44px"></div><div id="loginMsg" role="status" aria-live="polite"></div></div>':
+  gis?'<div class="card login"><b>🎓 '+L('Sign in with Google','用 Google 登入')+'</b><p class="muted" style="margin:4px 0 10px;font-size:14px">'+L('Any Google account works. Progress is saved on this device only (no class cloud sync yet).','任何 Google 帳戶都可以。進度只儲存在此裝置（尚未開通班級雲端同步）。')+'</p><div id="gbtn" style="display:flex;justify-content:center;min-height:44px"></div><div id="loginMsg" role="status" aria-live="polite"></div></div>':
+  '<div class="card login"><b>🎓 '+L('Students & teachers','學生及老師')+'</b><p class="muted" style="margin:4px 0 10px;font-size:14px">'+L('Google sign-in is not switched on for this copy yet.','此版本尚未開通 Google 登入。')+'</p><div id="loginMsg" role="status" aria-live="polite"></div></div>';
+ var previewCard=cloud?'':'<div class="card login"><b>'+L(gis?'Play without signing in':'Preview mode',gis?'不登入繼續玩':'預覽模式')+'</b><p class="muted" style="margin:4px 0 10px;font-size:14px">'+L('Progress stays on this device.','進度只儲存在此裝置。')+'</p>'+
+  (saved&&saved.started?'<p class="muted" style="margin:0 0 10px">'+LL(petDef(saved.active))+' · 🪙 '+saved.coins+' · 🔥 '+saved.streak+'</p><div class="row" style="justify-content:center"><button class="btn green" id="wResume">▶ '+L('Continue','繼續')+'</button><button class="btn white" id="wFresh">'+L('Start fresh','重新開始')+'</button></div>':
+  '<button class="btn green" id="wStart" style="min-width:220px">🌱 '+L('Start','開始')+'</button>')+'</div>'+
+  '<details style="width:100%;text-align:left"><summary style="cursor:pointer;font-weight:800;min-height:44px">🔑 '+L('I have a save code','我有存檔碼')+'</summary><textarea id="inCode" rows="3" aria-label="Save code"></textarea><div id="prev"></div><button class="btn pink small" id="chk" style="margin-top:8px">🔍 '+L('Preview','預覽')+'</button></details>';
  return '<div class="app"><div class="welcome"><div style="width:170px">'+petSVG('mochi','joy',{stage:1,eq:{hat:'h_sprout'}})+'</div><h1>'+L('Mochi Science Pals','麻糬科學小夥伴')+'</h1><p class="muted" style="margin:0">'+L('Study S2 Science (electricity), earn coins, and raise a squishy study buddy.','溫習中二科學（電的使用）、賺金幣，養大你的軟綿綿溫習拍檔。')+'</p>'+
  '<div class="lang2"><button class="btn '+(S.lang==='zh'?'pink':'white')+'" data-lang="zh">繁體中文</button><button class="btn '+(S.lang==='en'?'pink':'white')+'" data-lang="en">English</button></div>'+
- '<div class="card login"><b>🎓 '+L('Students & teachers','學生及老師')+'</b><p class="muted" style="margin:4px 0 10px;font-size:14px">'+(cloud?L('Sign in with your school Google account. Your progress is saved to your class record and works on any device.','用學校 Google 帳戶登入。進度會儲存到班級紀錄，任何裝置都可繼續。'):L('Class sign-in is not switched on for this copy. Students should use the class link from their teacher.','此版本未開通班級登入。學生請使用老師提供的班級連結。'))+'</p>'+(cloud?'<div id="gbtn" style="display:flex;justify-content:center;min-height:44px"></div>':'')+'<div id="loginMsg" role="status" aria-live="polite"></div></div>'+
- (cloud?'':'<div class="card login"><b>'+L('Preview mode','預覽模式')+'</b><p class="muted" style="margin:4px 0 10px;font-size:14px">'+L('Class sign-in is off on this copy, so it is a teacher preview. Progress stays on this device.','此版本未開通班級登入，只供老師預覽，進度只儲存在此裝置。')+'</p>'+
- (saved&&saved.started?'<p class="muted" style="margin:0 0 10px">'+LL(petDef(saved.active))+' · 🪙 '+saved.coins+' · 🔥 '+saved.streak+'</p><div class="row" style="justify-content:center"><button class="btn green" id="wResume">▶ '+L('Continue preview','繼續預覽')+'</button><button class="btn white" id="wFresh">'+L('Start fresh','重新開始')+'</button></div>':
- '<button class="btn green" id="wStart" style="min-width:220px">🌱 '+L('Start preview','開始預覽')+'</button>')+'</div>'+
- '<details style="width:100%;text-align:left"><summary style="cursor:pointer;font-weight:800;min-height:44px">🔑 '+L('I have a save code','我有存檔碼')+'</summary><textarea id="inCode" rows="3" aria-label="Save code"></textarea><div id="prev"></div><button class="btn pink small" id="chk" style="margin-top:8px">🔍 '+L('Preview','預覽')+'</button></details>')+
+ loginCard+previewCard+
  '<p class="foot">'+L('Original characters inspired by cosy Japanese kawaii art. Not affiliated with any brand.','原創角色，靈感來自日系療癒可愛風，與任何品牌無關。')+'</p></div></div>';}
 function bindWelcome(){document.querySelectorAll('[data-lang]').forEach(function(b){b.onclick=function(){S.lang=b.dataset.lang;var sv=load(KEY);if(sv){sv.lang=S.lang;try{localStorage.setItem(KEY,JSON.stringify(sv));}catch(e){}}render();};});
- if(cloudOn())renderGBtn('gbtn');
+ if(gisOn())renderGBtn('gbtn');
  var st=$('#wStart');if(st)st.onclick=function(){AUTH.mode='guest';S.started=true;S.lastTick=Date.now();ac();sfx('fanfare');bubble=L('Hi! I\'m Mochi. Let\'s study together!','你好！我係麻糬，一齊溫書啦！');save();render();};
  var rs=$('#wResume');if(rs)rs.onclick=function(){AUTH.mode='guest';var lang=S.lang;S=load(KEY);S.lang=lang;ac();sfx('tap');if(S.music)startMusic();render();openingPopup();};
  var fr=$('#wFresh');if(fr)fr.onclick=function(){confirmBox(L('Start fresh?','重新開始？'),L('This erases the preview Science Pals, coins and stars on this device.','這會清除此裝置上預覽模式的科學小夥伴、金幣和星星。'),L('Erase & start','清除並開始'),function(){AUTH.mode='guest';var lang=S.lang;S=defaultState();S.lang=lang;S.started=true;save();bubble=L('Hi! I\'m Mochi!','你好！我係麻糬！');});};
@@ -10496,11 +10501,15 @@ function offerGuestImport(){var g=load(KEY);if(!g||!g.started||g.imported||!AUTH
 /* ---- login screen: Mochi & Petal hero duo ---- */
 var LG_ATOM='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1CB0F6" stroke-width="1.6"/><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#CE82FF" stroke-width="1.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#FF86D0" stroke-width="1.6" transform="rotate(-60 12 12)"/><circle cx="12" cy="12" r="2.4" fill="#FF9600"/></svg>';
 var LG_DNA='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2c0 6 10 6 10 10S7 16 7 22M17 2c0 6-10 6-10 10s10 4 10 10" stroke="#58CC02" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M8.6 5h6.8M8.6 19h6.8M10 8.2h4M10 15.8h4" stroke="#1CB0F6" stroke-width="1.6" stroke-linecap="round"/></svg>';
-function welcomeHTML2(){var saved=load(KEY),cloud=cloudOn();
+function welcomeHTML2(){var saved=load(KEY),cloud=cloudOn(),gis=gisOn();
  var parts=[['l1',IC('flask')],['l2',LG_ATOM],['l3',IC('flask')],['l4',LG_ATOM],['r1',IC('leaf')],['r2',LG_DNA],['r3',IC('sparkle')],['r4',LG_DNA],['r5',IC('leaf')]].map(function(q,i){return '<span class="lgp '+q[0]+'" style="animation-delay:'+(i*-1.3)+'s">'+q[1]+'</span>';}).join('');
  var sils=['nova','finn','flan','gelato','luna'].map(function(id){return '<span class="lgsil">'+petSVG(id,'happy',{stage:1,eq:{},plain:1})+'</span>';}).join('');
  var signIn=cloud?'<div class="lgcard"><div class="lgcta-h">'+IC('level')+L('Students & teachers','學生及老師')+'</div><div class="lgg"><div id="gbtn"></div></div><p class="lgcap">'+IC('cloud')+L('Progress saves automatically to your school class record.','進度會自動儲存到你的班級紀錄。')+'</p><p class="lgcap guestcap">'+IC('user')+L('Not in an S2 science class? Sign in with your school account to play in guest mode (no leaderboard or records).','不是中二科學班的學生？用學校帳戶登入，即可以訪客模式遊玩（不設龍虎榜及紀錄）。')+'</p><div id="loginMsg" role="status" aria-live="polite"></div></div>':
-  '<div class="lgcard"><div class="lgcta-h">'+IC('sparkle')+L('Preview mode','預覽模式')+'</div><p class="lgcap" style="margin-top:0">'+L('Class sign-in is off on this copy, so it is a teacher preview. Progress stays on this device. Students should use the class link from their teacher.','此版本未開通班級登入，只供老師預覽，進度只儲存在此裝置。學生請使用老師提供的班級連結。')+'</p>'+
+  gis?'<div class="lgcard"><div class="lgcta-h">'+IC('level')+L('Sign in with Google','用 Google 登入')+'</div><div class="lgg"><div id="gbtn"></div></div><p class="lgcap">'+IC('user')+L('Any Google account works. Progress is saved on this device only.','任何 Google 帳戶都可以。進度只儲存在此裝置。')+'</p><p class="lgcap guestcap">'+IC('sparkle')+L('No class leaderboard or cloud sync until a class server is connected.','未連接班級伺服器前，不設龍虎榜及雲端同步。')+'</p><div id="loginMsg" role="status" aria-live="polite"></div></div>'+
+  '<div class="lgcard" style="margin-top:12px"><div class="lgcta-h">'+IC('sparkle')+L('Play without signing in','不登入繼續玩')+'</div><p class="lgcap" style="margin-top:0">'+L('Progress stays on this device.','進度只儲存在此裝置。')+'</p>'+
+  (saved&&saved.started?'<div class="row" style="justify-content:center"><button class="lgbtn" id="wResume">▶ '+L('Continue','繼續')+'</button><button class="btn white" id="wFresh">'+L('Start fresh','重新開始')+'</button></div>':'<button class="lgbtn" id="wStart">'+IC('sparkle')+L('Start','開始')+'</button>')+
+  '<details style="width:100%;text-align:left;margin-top:10px"><summary style="cursor:pointer;font-weight:800;min-height:44px">🔑 '+L('I have a save code','我有存檔碼')+'</summary><textarea id="inCode" rows="3" aria-label="Save code"></textarea><div id="prev"></div><button class="btn pink small" id="chk" style="margin-top:8px">🔍 '+L('Preview','預覽')+'</button></details></div>':
+  '<div class="lgcard"><div class="lgcta-h">'+IC('sparkle')+L('Preview mode','預覽模式')+'</div><p class="lgcap" style="margin-top:0">'+L('Google sign-in is not switched on for this copy yet. Progress stays on this device.','此版本尚未開通 Google 登入，進度只儲存在此裝置。')+'</p>'+
   (saved&&saved.started?'<div class="row" style="justify-content:center"><button class="lgbtn" id="wResume">▶ '+L('Continue preview','繼續預覽')+'</button><button class="btn white" id="wFresh">'+L('Start fresh','重新開始')+'</button></div>':'<button class="lgbtn" id="wStart">'+IC('sparkle')+L('Start preview','開始預覽')+'</button>')+
   '<details style="width:100%;text-align:left;margin-top:10px"><summary style="cursor:pointer;font-weight:800;min-height:44px">🔑 '+L('I have a save code','我有存檔碼')+'</summary><textarea id="inCode" rows="3" aria-label="Save code"></textarea><div id="prev"></div><button class="btn pink small" id="chk" style="margin-top:8px">🔍 '+L('Preview','預覽')+'</button></details><div id="loginMsg" role="status" aria-live="polite"></div></div>';
  var dust='';for(var k=0;k<22;k++)dust+='<i style="left:'+((k*37)%100)+'%;top:'+((k*53)%100)+'%;animation-delay:'+(-k*1.7)+'s;animation-duration:'+(14+k%5*3)+'s"></i>';
@@ -10537,7 +10546,7 @@ function palAdHTML(){var list=palAdList();if(!list.length)return '';if(palAdI==n
 function bindPalAd(){document.querySelectorAll('[data-padnav]').forEach(function(b){b.onclick=function(){palAdI+=+b.dataset.padnav;sfx('tap');var el=document.querySelector('.palad');if(el){var d=document.createElement('div');d.innerHTML=palAdHTML();el.replaceWith(d.firstChild);bindPalAd();}};});
  document.querySelectorAll('[data-padgo]').forEach(function(b){b.onclick=function(){sfx('tap');var k=b.dataset.padgo;if(k==='dict')openDictSetup(+b.dataset.u);else if(k==='shop'){shopTab='pets';curScreen='shop';render();window.scrollTo(0,0);}else if(k==='nobel'){curScreen='nobel';NQV={ch:null,task:null};render();window.scrollTo(0,0);}else startQuiz(quickSec().id,'quiz');};});}
 
-/* ---- school guest mode: school Google accounts that are not on the S1 class list ---- */
+/* ---- school guest mode: class-server not_listed fallback (school domain only; open mode uses enterOpenGoogle) ---- */
 var GUEST_DOMAIN='@ptcc.edu.hk';
 function schoolGuestOk(pl){var em=String(pl.email||'').toLowerCase();return pl.email_verified!==false&&em.slice(-GUEST_DOMAIN.length)===GUEST_DOMAIN;}
 function enterSchoolGuest(pl){var em=String(pl.email||'').toLowerCase(),lang=S.lang;
@@ -10625,12 +10634,15 @@ function dFinish(){var n=DQ.res.filter(function(r){return r.ok;}).length,tot=DQ.
  $('#dDone').onclick=closeModal;save();}
 
 /* =====================================================================
-   CLASS LOGIN (Google) · CLOUD SAVE · RECORDS · TEACHER DASHBOARD
-   Needs window.S1_CONFIG = {GOOGLE_CLIENT_ID, API_URL}. Empty = guest only.
+   GOOGLE LOGIN · CLOUD SAVE · RECORDS · TEACHER DASHBOARD
+   GOOGLE_CLIENT_ID alone → any Google account, on-device progress (open mode).
+   Client ID + API_URL → class server (cloud sync / leaderboard / teacher).
+   Both empty → preview / anonymous guest only.
    ===================================================================== */
 var CFGX=window.S1_CONFIG||{};
 var AUTH={mode:null,user:null,token:null,exp:0,stale:false,lastSync:0};
 var SESSION=Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);
+function gisOn(){return !!CFGX.GOOGLE_CLIENT_ID;}
 function cloudOn(){return !!(CFGX.GOOGLE_CLIENT_ID&&CFGX.API_URL);}
 function storeKey(){return AUTH.user?KEY+(AUTH.mode==='google'?'_u_':'_g_')+AUTH.user.email:KEY;}
 function dispName(){var u=AUTH.user;if(!u)return L('Preview','預覽');if(u.guest)return (u.zh||u.email.split('@')[0])+' · '+L('Guest','訪客');return (S.lang==='en'?(u.en||u.zh):(u.zh||u.en))||u.email;}
@@ -10647,11 +10659,19 @@ function withGIS(cb){if(window.google&&google.accounts&&google.accounts.id){if(!
  if(gisLoading){setTimeout(function(){withGIS(cb);},300);return;}gisLoading=true;
  var sc=document.createElement('script');sc.src='https://accounts.google.com/gsi/client';sc.async=true;
  sc.onload=function(){gisLoading=false;withGIS(cb);};sc.onerror=function(){gisLoading=false;loginMsg(L('Could not load Google sign-in. Check your internet and try again.','無法載入 Google 登入，請檢查網絡後再試。'),true);};document.head.appendChild(sc);}
-function renderGBtn(id){var el=document.getElementById(id);if(!el||!cloudOn())return;withGIS(function(){el.innerHTML='';google.accounts.id.renderButton(el,{theme:id==='gbtn'?'filled_blue':'outline',size:'large',shape:'pill',text:'signin_with',locale:S.lang==='en'?'en-GB':'zh-TW',width:260});});}
+function renderGBtn(id){var el=document.getElementById(id);if(!el||!gisOn())return;withGIS(function(){el.innerHTML='';google.accounts.id.renderButton(el,{theme:id==='gbtn'?'filled_blue':'outline',size:'large',shape:'pill',text:'signin_with',locale:S.lang==='en'?'en-GB':'zh-TW',width:260});});}
 function jwtPayload(t){try{var p=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');while(p.length%4)p+='=';return JSON.parse(decodeURIComponent(escape(atob(p))));}catch(e){return {};}}
 function loginMsg(t,bad){var m=$('#loginMsg');if(m)m.innerHTML='<p style="margin:8px 0 0;font-weight:700;color:'+(bad?'#B4475A':'var(--ink2)')+'">'+esc(t)+'</p>';}
+function enterOpenGoogle(pl){var em=String(pl.email||'').toLowerCase();
+ if(pl.email_verified===false||!em){loginMsg(errText('unverified'),true);return;}
+ var lang=S.lang,nm=String(pl.name||em.split('@')[0]||'');
+ AUTH.mode='guest';AUTH.user={email:em,zh:nm,en:nm,guest:true};AUTH.token=null;AUTH.stale=false;
+ var local=load(storeKey());if(local){S=local;}else{S=defaultState();bubble=L('Hi! I\'m Mochi. Let\'s study together!','你好！我係麻糬，一齊溫書啦！');}
+ S.lang=lang;S.started=true;curScreen='home';ac();save();render();openingPopup();
+ setTimeout(function(){toast(IC('user')+' '+L('Signed in with Google. Progress stays on this device.','已用 Google 登入。進度只儲存在此裝置。'));},900);}
 function onCredential(resp){var tok=resp.credential,pl=jwtPayload(tok),em=String(pl.email||'').toLowerCase();
  if(AUTH.mode==='google'&&AUTH.user&&em===AUTH.user.email){AUTH.token=tok;AUTH.exp=(pl.exp||0)*1000;AUTH.stale=false;$('#ovroot').innerHTML='';toast('☁️ '+L('Reconnected – progress synced','已重新連線，進度已同步'));flushQueue();cloudSaveSoon(1);render();return;}
+ if(!cloudOn()){enterOpenGoogle(pl);return;}
  AUTH.token=tok;AUTH.exp=(pl.exp||0)*1000;loginMsg('⏳ '+L('Checking the class list…','正在核對班級名單…'));
  post('login',{}).then(function(j){if(!j.ok){AUTH.token=null;if(j.error==='not_listed'&&schoolGuestOk(pl)){enterSchoolGuest(pl);return;}loginMsg(errText(j.error),true);return;}
   AUTH.mode='google';AUTH.user=j.user;AUTH.stale=false;AUTH.lastSync=Date.now();
@@ -10716,8 +10736,8 @@ function openAccount(){var u=AUTH.user,q=getQ().length,h='<div class="sheet-h"><
   '<span style="font-size:14px">'+(AUTH.stale?'⚠️ '+L('Sign-in expired – sign in again to keep syncing.','登入已過期，請重新登入以繼續同步。'):'☁️ '+L('Synced ','已同步 ')+(AUTH.lastSync?new Date(AUTH.lastSync).toLocaleTimeString():'')+(q?' · '+q+L(' records waiting',' 條記錄待上傳'):''))+'</span></div>'+
   (AUTH.stale?'<div id="gbtn2" style="display:flex;justify-content:center;margin-top:12px;min-height:44px"></div>':'<div class="row" style="margin-top:12px"><button class="btn green" id="aSync">☁️ '+L('Sync now','立即同步')+'</button></div>')+
   '<div class="row" style="margin-top:12px"><button class="btn white" id="aOut">🚪 '+L('Sign out','登出')+'</button></div>';}
- else if(AUTH.user&&AUTH.user.guest)h+='<div class="card grid" style="gap:6px"><b style="font-size:18px">'+esc(u.zh||'')+'</b><span class="muted" style="font-size:13px">'+esc(u.email)+'</span><span style="font-size:14px">'+IC('user')+' '+L('<b>Guest mode</b>: progress is saved on this device only. No leaderboard or class records.','<b>訪客模式</b>：進度只儲存在此裝置，不設龍虎榜及班級紀錄。')+'</span></div><div class="row" style="margin-top:12px"><button class="btn white" id="aOut">🚪 '+L('Sign out','登出')+'</button></div>';
- else h+='<p>'+L('This is <b>preview mode</b> (class sign-in is off on this copy). Progress stays on this device.','這是<b>預覽模式</b>（此版本未開通班級登入），進度只儲存在此裝置。')+'</p>'+(cloudOn()?'<button class="btn green" id="aIn">🎓 '+L('Sign in to my class','登入我的班級')+'</button>':'');
+ else if(AUTH.user&&AUTH.user.guest)h+='<div class="card grid" style="gap:6px"><b style="font-size:18px">'+esc(u.zh||'')+'</b><span class="muted" style="font-size:13px">'+esc(u.email)+'</span><span style="font-size:14px">'+IC('user')+' '+L('<b>Signed in (on this device)</b>: progress is saved here only. No class leaderboard or cloud sync.','<b>已登入（僅此裝置）</b>：進度只儲存在此，不設班級龍虎榜及雲端同步。')+'</span></div><div class="row" style="margin-top:12px"><button class="btn white" id="aOut">🚪 '+L('Sign out','登出')+'</button></div>';
+ else h+='<p>'+L(gisOn()?'You are in <b>preview mode</b>. Progress stays on this device. Sign in with any Google account to keep a per-account save on this device.':'This is <b>preview mode</b> (Google sign-in is off on this copy). Progress stays on this device.',gisOn()?'你正使用<b>預覽模式</b>，進度只儲存在此裝置。用任何 Google 帳戶登入，可以在此裝置保存獨立進度。':'這是<b>預覽模式</b>（此版本未開通 Google 登入），進度只儲存在此裝置。')+'</p>'+(gisOn()?'<button class="btn green" id="aIn">🎓 '+L(cloudOn()?'Sign in to my class':'Sign in with Google',cloudOn()?'登入我的班級':'用 Google 登入')+'</button>':'');
  modal(h);$('#xClose').onclick=closeModal;
  if($('#gbtn2'))renderGBtn('gbtn2');
  if($('#aSync'))$('#aSync').onclick=function(){cloudSave();flushQueue();toast('☁️ '+L('Syncing…','同步中…'));};

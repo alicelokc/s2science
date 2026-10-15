@@ -1,5 +1,7 @@
 # Class login setup (about 20 minutes, once)
 
+**Open Google login (no class list):** put only a Web **OAuth Client ID** in `window.S1_CONFIG.GOOGLE_CLIENT_ID` and leave `API_URL` empty. Any verified Google account can sign in; progress stays on the device. Use the steps below when you also want class cloud sync / teacher dashboard.
+
 Class sign-in needs three things: your **Google Sheet** (name list + records), a **Google Apps Script** (checks sign-ins, saves records), and a **Google OAuth Client ID** (shows the "Sign in with Google" button).
 
 > 🔒 Student names and emails stay in **your private Google Sheet**. They are never put in the public website or GitHub repo.
@@ -13,7 +15,7 @@ Class sign-in needs three things: your **Google Sheet** (name list + records), a
 
 ## Step 2 · The Google Client ID
 - If your maths game already has a Web **OAuth Client ID**, you can reuse it: open it in [Google Cloud Console → APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials) and add this to **Authorised JavaScript origins**:
-  `https://kcchamaa-sys.github.io`
+  `https://alicelokc.github.io` (S2 Pages) or your own Pages origin
 - Otherwise: **Create credentials → OAuth client ID → Web application**, add the origin above, then save.
 - Copy the **Client ID** (ends with `.apps.googleusercontent.com`).
 
