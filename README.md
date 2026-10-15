@@ -1,3 +1,5 @@
+Live site: https://alicelokc.github.io/s2science/
+
 # Mochi Science Pals — S2 (Unit 8 electricity demo)
 
 This folder is a **fork** of the S1 Mochi Science Pals game shell, retargeted for **Hong Kong Junior Science S2 — Unit 8: Making use of electricity / 電的使用** (sub-topics 8.1–8.7).
